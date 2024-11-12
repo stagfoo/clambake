@@ -20,7 +20,17 @@
     "spellcheck"
   ],
   "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/camera": "^6.1.0",
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/filesystem": "^6.0.1",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/keyboard": "^6.0.2",
+    "@capacitor/storage": "^1.2.5",
+    "immer": "^10.1.1",
     "joro": "^1.0.4",
+    "mitt": "^3.0.1",
     "morphdom": "^2.6.1",
     "nanohtml": "^1.9.0",
     "nanomorph": "^5.4.3",
@@ -29,7 +39,13 @@
     "vite-plugin-singlefile": "^0.13.2"
   },
   "devDependencies": {
-    "typescript": "^4.9.3",
-    "vite": "^4.0.0"
+    "@types/node": "^22.9.0",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.14",
+    "postcss": "^8.4.48",
+    "tailwindcss": "^3.4.14",
+    "tsup": "^8.3.5",
+    "typescript": "^4.9.5",
+    "vite": "^4.5.5"
   }
 }

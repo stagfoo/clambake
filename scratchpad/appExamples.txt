@@ -1,0 +1,12 @@
+      <div class="flex flex-col items-center">
+      <h1>Your Books</h1>
+      ${UI.carousel({ items: [
+        { img: 'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp', event: 'EXAMPLE_PAGE' },
+        { img: 'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp', event: 'EXAMPLE_PAGE' },
+        { img: 'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp', event: 'EXAMPLE_PAGE' },
+      ] })}
+      </div>
+      <div class="flex flex-col items-center grow">
+      <h1>Recent Bubbles</h1>
+      </div>
+      ${UI.listItem({ img: 'https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp', text: 'The Great Gatsby', event: 'EXAMPLE_PAGE' })}
