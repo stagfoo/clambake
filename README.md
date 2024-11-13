@@ -15,38 +15,43 @@
 install deps and run developement
 
 ```
-nvm use;
-yarn;
-yarn dev;
+nvm use; yarn; yarn dev;
 ```
 
-# Why did we develop this?
+# The Goal
 
-- To build quick demo applications and test ideas.
-- Its got one global state focusing on (data = view)
-- Routing is super transparent
-- Who needs folders in such small apps
-- Simple entry point if you want to change the UI
-- Good for glitch projects
-- compiles to a single HTML file for easy app webview bundling
+I want to create app based on what I have mentioned in this article https://stagfoo.com/dumbprograms
+using the same idea but in web tech, I created this repo. I want everyone to make tiny, good, multi-platform apps.
+compiling out to a single index.html has that sort of gameboy-ness that helps apps last forever.
+
+The bolierplate aims and make it small and fun to make something. The choices in this repo follow the below principles, if you
+don't like this probably stick with [v1]()
+
+```mermaid
+
+global event bus loop
+
+```
+
+# Principles
+
+- be unable to sunset
+- treat the Internet like a tap that's on or off.
+- be obvious and explicitly when it's connecting to the Internet
+- Files will be the primary input and output (YAML/TOML preferably).
+- no login, no accounts
+- Personal information should be avoid or encrypted
+- Draggable UX or Keyboard focused UX are preferred (feeling like an instrument)
+- Old ugly is the new cute
+- Minimalistic
+- Non internet sharing is preferably (offline QR Code).
 
 # Whats inside
 
 - 🖼️ UI = [nanohtml](https://github.com/choojs/nanohtml)
-- 🍖 Store = [Obake.js](https://github.com/stagfoo/obake)
-- 🦴 Router = [Page.js](https://visionmedia.github.io/page.js/)
-- 🍹 Styles = Just Javascript and strings [Joro](https://github.com/stagfoo/joro).
-
-
-# What is a chumbucket?
-
-A bucket for holding a form of bait used to attract sharks
-
-![jaws chum](https://thumbs.gfycat.com/ForkedAptFurseal-small.gif)
-
-# suggested bundlers
-- [fiskabur 🐡](https://github.com/stagfoo/fiskabur)
-- [android-js](https://android-js.github.io/)
+- 🍖 Store = [Obake.js](https://github.com/stagfoo/obake) (For now)
+- Pubsub [Mitt.js]() 
+- 🍹 Styles = Tailwind
 
 # Support Me
 
