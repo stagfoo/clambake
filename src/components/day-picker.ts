@@ -16,7 +16,7 @@ export function DayPicker(selectedDate = new Date()) {
   }
 
   const weekDates = getWeekDates(selectedDate)
-  const today = new Date()
+  // const today = new Date()
 
   return html`
     <div class="flex gap-1 p-4 bg-gray-50 rounded-lg">

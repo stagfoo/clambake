@@ -2,7 +2,7 @@ declare module 'obake.js'
 declare module 'nanomorph'
 
 //TODO namespace?
-type View = 'HOME' | 'EXAMPLE_PAGE';
+type View = 'HOME' | 'SORTER';
 
 // Default events for all apps include io and updateView
 type Events = {
@@ -22,5 +22,6 @@ type State = {
 	_update: (_reducerName: string, _data: unknown) => Promise<State>;
 	currentImageIndex: number;
 	images: string[];
-	sortedImages: Record<string, string[]>;
+	sortFolders: Record<string, string[]>;
+	basePath: string;
 };

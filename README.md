@@ -12,7 +12,7 @@
 
 # Get Started
 
-install deps and run developement
+install deps and run development
 
 ```
 nvm use; yarn; yarn dev;
@@ -32,6 +32,15 @@ don't like this probably stick with [v1]()
 global event bus loop
 
 ```
+# Utils
+
+- File/Image access with cap
+- Yaml Db with caps (cap utils)
+- Draggable UX libs (interactjs)
+- Keyboard event libs (mitt)
+- Old ugly is the new cute (default theme?)
+- be obvious and explicitly when it's connecting to the Internet - internet component with cap utils
+
 
 # Principles
 
@@ -43,7 +52,7 @@ global event bus loop
 - Personal information should be avoid or encrypted
 - Draggable UX or Keyboard focused UX are preferred (feeling like an instrument)
 - Old ugly is the new cute
-- Minimalistic
+- Minimalistic in function
 - Non internet sharing is preferably (offline QR Code).
 
 # Whats inside

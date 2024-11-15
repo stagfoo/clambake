@@ -2,7 +2,7 @@ import html from 'nanohtml';
 import { ACTIONS } from '../domain';
 
 type FolderButtonsProps = {
-  sortedImages: Record<string, string[]>;
+  sortFolders: Record<string, string[]>;
   currentImageIndex: number;
   images: string[];
 }
@@ -10,6 +10,7 @@ type FolderButtonsProps = {
 export type FolderButtonEvents = {
   sortImage: string;
   addFolder: string;
+  openFolderRequestDialog: boolean;
 }
 
 function folderAction({
@@ -27,10 +28,26 @@ function folderAction({
   `;
 }
 
+export function keepButton(isDisabled: boolean): HTMLElement {
+  return folderAction({
+    folderName: 'Keep',
+    isDisabled,
+    buttonClass: 'bg-green-500 hover:bg-green-600'
+  });
+}
+
+export function deleteButton(isDisabled: boolean): HTMLElement {
+  return folderAction({
+    folderName: 'Delete',
+    isDisabled,
+    buttonClass: 'bg-red-500 hover:bg-red-600'
+  });
+}
+
 export function folderButtons(state: FolderButtonsProps): HTMLElement {
   const isDisabled = state.currentImageIndex >= state.images.length;
   const mainButtons = ['Keep', 'Delete'];
-  const folders = Object.keys(state.sortedImages).filter((f) => !mainButtons.includes(f)).map(folderName => {
+  const folders = Object.keys(state.sortFolders).filter((f) => !mainButtons.includes(f)).map(folderName => {
     const colorClass = 'bg-purple-500 hover:bg-purple-600';
 
     const buttonClass = `px-4 py-2 ${colorClass} text-white rounded-md transition-colors duration-200 
@@ -51,13 +68,7 @@ export function folderButtons(state: FolderButtonsProps): HTMLElement {
   return html`
       <div class="space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Sort into folders:</h2>
-        <div class="flex flex-wrap gap-3" id="folders">
-          ${folderAction({
-    folderName: 'Keep', isDisabled, buttonClass: 'bg-green-500 hover:bg-green-600'
-  })}
-          ${folderAction({ folderName: 'Delete', isDisabled, buttonClass: 'bg-red-500 hover:bg-red-600' })}
-        </div>
-        <div class="flex flex-wrap gap-3" id="folders">
+        <div class="flex gap-3 overflow-x-scroll" id="folders">
           ${folders}
         </div>
         <hr>

@@ -24,3 +24,21 @@ export function carousel(props: CarouselProps): HTMLElement {
     </div>
   `;
 }
+
+type CarouselWithButtonProps = {
+  items: any[];
+}
+
+export function carouselButtons(props: CarouselWithButtonProps): HTMLElement {
+  return html`
+  <div class="flex max-w-4xl flex-wrap">
+    <div class="carousel carousel-center bg-neutral rounded-box max-w-md space-x-4 p-4">
+      ${props.items.map(item => html`
+        <div class="carousel-item">
+          ${item}
+        </div>
+      `)}
+    </div>
+  </div>
+`;
+}

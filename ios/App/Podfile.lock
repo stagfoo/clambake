@@ -1,28 +1,58 @@
 PODS:
   - Capacitor (6.1.2):
     - CapacitorCordova
+  - CapacitorCamera (6.1.0):
+    - Capacitor
   - CapacitorCordova (6.1.2)
+  - CapacitorFilePicker (0.0.1):
+    - Capacitor
   - CapacitorFilesystem (6.0.1):
+    - Capacitor
+  - CapacitorFolderPicker (0.0.2):
+    - Capacitor
+  - CapacitorKeyboard (6.0.2):
+    - Capacitor
+  - CapacitorStorage (1.2.5):
     - Capacitor
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCamera (from `../../node_modules/@capacitor/camera`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - CapacitorFilePicker (from `../../node_modules/capacitor-file-picker`)
   - "CapacitorFilesystem (from `../../node_modules/@capacitor/filesystem`)"
+  - CapacitorFolderPicker (from `../../node_modules/capacitor-folder-picker`)
+  - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
+  - "CapacitorStorage (from `../../node_modules/@capacitor/storage`)"
 
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorCamera:
+    :path: "../../node_modules/@capacitor/camera"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorFilePicker:
+    :path: "../../node_modules/capacitor-file-picker"
   CapacitorFilesystem:
     :path: "../../node_modules/@capacitor/filesystem"
+  CapacitorFolderPicker:
+    :path: "../../node_modules/capacitor-folder-picker"
+  CapacitorKeyboard:
+    :path: "../../node_modules/@capacitor/keyboard"
+  CapacitorStorage:
+    :path: "../../node_modules/@capacitor/storage"
 
 SPEC CHECKSUMS:
   Capacitor: 679f9673fdf30597493a6362a5d5bf233d46abc2
+  CapacitorCamera: 81ce64062cd82b82cc75a79616fda4bd09d7f643
   CapacitorCordova: f48c89f96c319101cd2f0ce8a2b7449b5fb8b3dd
+  CapacitorFilePicker: dcc675cd5cc67baa0eb2e648fdbc38f4a4b18ff6
   CapacitorFilesystem: 37fb3aa5c945b4539ab11c74a5c57925a302bf24
+  CapacitorFolderPicker: aa7fe042b4d525daffe3e32a85e1674804ae3bf8
+  CapacitorKeyboard: 2700f9b18687be021e28b5a09b59eb151a46d5e0
+  CapacitorStorage: 63255170c2f7e9f7363b3e5e015584e6d18f2969
 
-PODFILE CHECKSUM: 73437dea079dd6c5718d3902ebf782137e5496d2
+PODFILE CHECKSUM: 95fd96bc33e1f0fe41f77bbc0b33536a8625f83a
 
 COCOAPODS: 1.15.2

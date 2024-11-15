@@ -1,6 +1,5 @@
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Capacitor } from '@capacitor/core';
+import { FolderPicker } from 'capacitor-folder-picker';
 
 interface ImageFile {
   name: string;
@@ -8,141 +7,108 @@ interface ImageFile {
   data: string;
 }
 
-export class ImageHandler {
-  // Platform-specific paths
-  private readonly ANDROID_DCIM_PATH = 'DCIM/Camera';
-  private readonly IOS_DCIM_PATH = 'DCIM';
-  
-  /**
-   * Get the correct DCIM path based on platform
-   */
-  private get DCIM_PATH(): string {
-    return Capacitor.getPlatform() === 'android' 
-      ? this.ANDROID_DCIM_PATH 
-      : this.IOS_DCIM_PATH;
-  }
+export const isImageFile = (fileName: string): boolean => {
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+  return imageExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
+};
 
-  /**
-   * Load all images from the platform-specific DCIM directory
-   */
-  async loadImagesFromDCIM(): Promise<ImageFile[]> {
-    try {
-      const result = await Filesystem.readdir({
-        path: this.DCIM_PATH,
-        directory: Directory.External
-      });
+export const loadImagesFromFolder = async (path: string): Promise<{ result?: ImageFile[], error?: any }> => {
+  try {
+    const result = await Filesystem.readdir({
+      path,
+      directory: Directory.External
+    });
 
-      const images: ImageFile[] = [];
-      
-      for (const file of result.files) {
-        if (this.isImageFile(file.name)) {
-          const fileContent = await Filesystem.readFile({
-            path: `${this.DCIM_PATH}/${file.name}`,
-            directory: Directory.External
-          });
+    const images: ImageFile[] = [];
+    
+    for (const file of result.files) {
+      if (isImageFile(file.name)) {
+        const fileContent = await Filesystem.readFile({
+          path: `${path}/${file.name}`,
+          directory: Directory.External
+        });
 
-          images.push({
-            name: file.name,
-            path: `${this.DCIM_PATH}/${file.name}`,
-            data: fileContent.data as string
-          });
-        }
+        images.push({
+          name: file.name,
+          path: `${path}/${file.name}`,
+          data: fileContent.data as string
+        });
       }
-
-      return images;
-    } catch (error) {
-      console.error('Error loading images:', error);
-      throw error;
     }
+
+    return { result: images };
+  } catch (error) {
+    console.error('Error loading images:', error);
+    return { error };
   }
+};
 
-  /**
-   * Create a new folder at the same level as the Camera folder (for Android)
-   * or DCIM folder (for iOS)
-   */
-  async createFolder(folderName: string): Promise<void> {
-    try {
-      const basePath = Capacitor.getPlatform() === 'android'
-        ? 'DCIM' // Create folder at DCIM level on Android
-        : this.DCIM_PATH;
+export const createFolder = async (basePath: string, folderName: string): Promise<{ result?: boolean | null, error?: any }> => {
+  try {
+    await Filesystem.mkdir({
+      path: `${basePath}/${folderName}`,
+      directory: Directory.External,
+      recursive: true
+    });
 
-      await Filesystem.mkdir({
-        path: `${basePath}/${folderName}`,
-        directory: Directory.External,
-        recursive: true
-      });
-    } catch (error) {
-      console.error('Error creating folder:', error);
-      throw error;
-    }
+    return { result: true, error: null };
+  } catch (error) {
+    console.error('Error creating folder:', error);
+    return { result: null, error };
   }
+};
 
-  /**
-   * Move an image to a specific folder
-   */
-  async moveImageToFolder(imagePath: string, folderName: string): Promise<void> {
-    try {
-      const fileName = imagePath.split('/').pop();
-      if (!fileName) throw new Error('Invalid image path');
+export const moveImageToFolder = async (basePath: string, imagePath: string, folderName: string): Promise<{ result?: boolean | null, error?: any }> => {
+  try {
+    const fileName = imagePath.split('/').pop();
+    if (!fileName) throw new Error('Invalid image path');
 
-      const basePath = Capacitor.getPlatform() === 'android'
-        ? 'DCIM' // Move to DCIM level on Android
-        : this.DCIM_PATH;
+    await Filesystem.rename({
+      from: imagePath,
+      to: `${basePath}/${folderName}/${fileName}`,
+      directory: Directory.External
+    });
 
-      await Filesystem.rename({
-        from: imagePath,
-        to: `${basePath}/${folderName}/${fileName}`,
-        directory: Directory.External
-      });
-    } catch (error) {
-      console.error('Error moving image:', error);
-      throw error;
-    }
+    return { result: true, error: null };
+  } catch (error) {
+    console.error('Error moving image:', error);
+    return { error, result: null };
   }
+};
 
-  /**
-   * Take a new photo and save it to a specific folder
-   */
-  async takePhotoAndSave(folderName: string): Promise<ImageFile> {
-    try {
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera
-      });
-
-      if (!image.path) throw new Error('No image path returned');
-
-      const fileName = `IMG_${new Date().getTime()}.${image.format}`;
-      const basePath = Capacitor.getPlatform() === 'android'
-        ? 'DCIM' // Save to DCIM level on Android
-        : this.DCIM_PATH;
-
-      const savedImage = await Filesystem.writeFile({
-        path: `${basePath}/${folderName}/${fileName}`,
-        data: image.webPath!,
-        directory: Directory.External
-      });
-
-      return {
-        name: fileName,
-        path: `${basePath}/${folderName}/${fileName}`,
-        data: image.webPath!
-      };
-    } catch (error) {
-      console.error('Error taking and saving photo:', error);
-      throw error;
-    }
+export async function pickFolder(): Promise<{ result?: string, error?: any }> {
+  try {
+    const result = await FolderPicker.chooseFolder();
+    console.log('Selected folder path:', result.value);
+    return { result: result.value };
+  } catch (error) {
+    console.error('Error picking folder:', error);
+    return { error };
   }
+}
 
-  /**
-   * Check if a file is an image based on its extension
-   */
-  private isImageFile(fileName: string): boolean {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    return imageExtensions.some(ext => 
-      fileName.toLowerCase().endsWith(ext)
-    );
+export async function listFolders(folderPath: string): Promise<{ result?: { folderPath: string, folders: string[] }, error?: any }> {
+  try {
+    const contents = await Filesystem.readdir({
+      path: folderPath,
+      directory: Directory.Documents
+    });
+
+    const folderPromises = contents.files.map(async (item) => {
+      const statResult = await Filesystem.stat({
+        path: `${folderPath}/${item}`,
+        directory: Directory.Documents
+      });
+      return { name: item, isFolder: statResult.type === 'directory' };
+    });
+
+    const folderDetails = await Promise.all(folderPromises);
+    const folders = folderDetails.filter((item) => item.isFolder).map((item) => item.name);
+
+    return { result: { folderPath, folders: folders.map(folder => folder.name) } };
+  } catch (error) {
+    console.error('Error listing folders:', error);
+    alert('An error occurred while listing folders. Please check the console for details.');
+    return { error };
   }
 }
