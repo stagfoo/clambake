@@ -10,7 +10,7 @@ type listItemProps = {
 export function listItem(props: listItemProps): HTMLElement {
     return html `
     <div class="flex flex-row items-center grow border-2 rounded p-2" onclick="${() => {
-        ACTIONS.emit(props.event as keyof Events, props as any)
+        ACTIONS.emit(props.event, props)
     }}">
     <div class="flex flex-col items-center">
     <div class="avatar">

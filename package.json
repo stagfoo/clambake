@@ -23,35 +23,32 @@
     "spellcheck"
   ],
   "dependencies": {
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/camera": "^6.1.0",
-    "@capacitor/cli": "^6.1.2",
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/filesystem": "^6.0.1",
-    "@capacitor/ios": "^6.1.2",
-    "@capacitor/keyboard": "^6.0.2",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/camera": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/filesystem": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0",
     "@capacitor/storage": "^1.2.5",
     "capacitor-file-picker": "^1.0.10",
     "capacitor-folder-picker": "^0.0.2",
     "immer": "^10.1.1",
     "interactjs": "^1.10.27",
-    "joro": "^1.0.4",
     "mitt": "^3.0.1",
-    "morphdom": "^2.6.1",
+    "morphdom": "^2.7.4",
     "nanohtml": "^1.9.0",
     "nanomorph": "^5.4.3",
-    "obake.js": "^1.2.1",
-    "page": "^1.11.4",
-    "vite-plugin-singlefile": "^0.13.2"
+    "vite-plugin-singlefile": "^2.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.14",
-    "postcss": "^8.4.48",
-    "tailwindcss": "^3.4.14",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
     "tsup": "^8.3.5",
-    "typescript": "^4.9.5",
-    "vite": "^4.5.5"
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
   }
 }

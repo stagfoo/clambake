@@ -2,16 +2,22 @@
     "version": "0.1",
     "language": "en-GB",
     "words": [
-        "stagfoo",
-        "nanomorph",
+        "daisyui",
+        "Fira",
+        "immer",
+        "interactjs",
+        "joro",
         "morphdom",
         "nanohtml",
-        "nanohtml",
+        "nanomorph",
         "obake",
-        "joro",
-        "workbox",
-        "Fira",
-        "Staatliches"
+        "Staatliches",
+        "stagfoo",
+        "tailwindcss",
+        "tsup",
+        "workbox"
     ],
-    "ignorePaths": ["**/node_modules/**"]
+    "ignorePaths": [
+        "**/node_modules/**"
+    ]
 }

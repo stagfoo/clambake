@@ -78,37 +78,76 @@ export const moveImageToFolder = async (basePath: string, imagePath: string, fol
 
 export async function pickFolder(): Promise<{ result?: string, error?: any }> {
   try {
+    //Lib Typing is wrong
     const result = await FolderPicker.chooseFolder();
-    console.log('Selected folder path:', result.value);
-    return { result: result.value };
+    const folderResult = result as unknown as { path: string };
+    return { result: folderResult.path };
   } catch (error) {
-    console.error('Error picking folder:', error);
+    console.log('Error picking folder:', error);
     return { error };
   }
 }
 
 export async function listFolders(folderPath: string): Promise<{ result?: { folderPath: string, folders: string[] }, error?: any }> {
+  // Step 1: Read directory contents
+  let contents;
   try {
-    const contents = await Filesystem.readdir({
-      path: folderPath,
-      directory: Directory.Documents
+    contents = await Filesystem.readdir({
+      path: 'DCIM',
+      directory: Directory.ExternalStorage
     });
+    console.log('Step 1 - Directory contents:', contents);
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    return { error: 'Failed to read directory' };
+  }
 
-    const folderPromises = contents.files.map(async (item) => {
+  // Step 2: Create stat promises
+  let folderPromises;
+  try {
+    folderPromises = contents.files.map(async (item) => {
       const statResult = await Filesystem.stat({
         path: `${folderPath}/${item}`,
         directory: Directory.Documents
       });
       return { name: item, isFolder: statResult.type === 'directory' };
     });
-
-    const folderDetails = await Promise.all(folderPromises);
-    const folders = folderDetails.filter((item) => item.isFolder).map((item) => item.name);
-
-    return { result: { folderPath, folders: folders.map(folder => folder.name) } };
+    console.log('Step 2 - Created folder promises');
   } catch (error) {
-    console.error('Error listing folders:', error);
-    alert('An error occurred while listing folders. Please check the console for details.');
-    return { error };
+    console.error('Error creating stat promises:', error);
+    return { error: 'Failed to create stat promises' };
+  }
+
+  // Step 3: Resolve promises and filter folders
+  let folderDetails;
+  try {
+    folderDetails = await Promise.all(folderPromises);
+    console.log('Step 3 - Processed folders:', folderDetails);
+  } catch (error) {
+    console.error('Error resolving promises:', error);
+    return { error: 'Failed to resolve promises' };
+  }
+  // Step 4: Filter folders and return result
+  try {
+    if(folderDetails) {
+      console.log('folderDetails', folderDetails)
+      const folders = folderDetails.filter((item) => item.isFolder).map((item) => item.name);
+      console.log('folders', folders); 
+      const folderList = folders.map((folder) => folder.name);
+      console.log('Step 4 - Filtered folders:', folderList);
+      return { result: { folderPath, folders: folderList } };
+    }
+  } catch (error) {
+    console.error('Error processing folder details:', error);
+    return { error: 'Failed to process folder details' };
   }
 }
+
+// Validation functions
+export const validateFolderName = (name: string): boolean => {
+  const MAX_FOLDER_NAME_LENGTH = 50;
+  if (!name || !name.trim()) throw new Error('Folder name cannot be empty');
+  if (name.length > MAX_FOLDER_NAME_LENGTH) throw new Error(`Folder name cannot exceed ${MAX_FOLDER_NAME_LENGTH} characters`);
+  if (!/^[a-zA-Z0-9-_\s]+$/.test(name)) throw new Error('Folder name can only contain letters, numbers, spaces, hyphens, and underscores');
+  return true;
+};

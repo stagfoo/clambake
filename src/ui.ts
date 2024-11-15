@@ -2,6 +2,7 @@ import html from 'nanohtml';
 // TODO - rename UI to something more descriptive
 import * as UI from './components';
 import { ACTIONS } from './domain';
+import { State } from './store';
 
 export function ui(state: State): HTMLElement {
   return html`

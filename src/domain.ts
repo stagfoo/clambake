@@ -1,101 +1,110 @@
 import mitt from 'mitt';
-import { reducer } from 'obake.js';
-import { FolderButtonEvents } from './components';
-import morph from 'nanomorph';
-import { createStore } from 'obake.js';
-import { ui } from './ui';
 import * as imageModule from './modules/image-handler';
-
-type AppEvents = Events & FolderButtonEvents;
-
-export const ACTIONS = mitt<AppEvents>();
-
-// Renderer
-const ROOT_NODE = document.body.querySelector('#root');
-export function renderer(newState: State) {
-	morph(ROOT_NODE, ui(newState), {
-		onBeforeElUpdated: (fromEl: HTMLElement, toEl: HTMLElement) => !fromEl.isEqualNode(toEl),
-	});
-}
-
-export const defaultState: Omit<State, '_update'> = {
-	currentImageIndex: 0,
-	images: [
-		"https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp",
-		"https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp",
-	],
-	sortFolders: {
-		'Keep': [],
-		'Delete': [],
+import { store, DEFAULT_FOLDERS } from './store';
+// Action Creators
+const reducers = {
+	setView: (view: View) => {
+		store.setState(draft => {
+			draft.view = view;
+		});
 	},
-	basePath: 'DCIM',
-	view: 'HOME',
+
+	setBasePath: (path: string) => {
+		store.setState(draft => {
+			draft.basePath = path;
+		});
+	},
+
+	sortImage: (folderName: string) => {
+		store.setState(draft => {
+			if (draft.currentImageIndex >= draft.images.length) return;
+
+			draft.sortFolders[folderName] ??= [];
+			draft.sortFolders[folderName].push(draft.images[draft.currentImageIndex]);
+			draft.currentImageIndex++;
+		});
+	},
+
+	addFolder: (folderName: string) => {
+		store.setState(draft => {
+			if (!folderName || folderName in draft.sortFolders) return;
+			draft.sortFolders[folderName] = [];
+		});
+	},
+
+	addMultipleFolders: (folderNames: string[]) => {
+		store.setState(draft => {
+			draft.sortFolders = Object.fromEntries(folderNames.map(folder => [folder, []]));
+		});
+	},
+
+	resetImageIndex: () => {
+		store.setState(draft => {
+			draft.currentImageIndex = 0;
+		});
+	}
 };
 
-// Store Setup
-export const state: State = createStore(
-	defaultState,
-	{ renderer,  log: (a: State) => console.log('📜', a) },
-	{
-		currentPage: reducer((state: State, value: View) => {
-			state.view = value;
-		}),
-		setBasePath: reducer((state: State, value: string) => {
-			state.basePath = value;
-		}),
-		sortImage: reducer((state: State, folderName: string) => {
-			state.sortFolders[folderName].push(state.images[state.currentImageIndex]);
-			state.currentImageIndex++;
-		}),
-		addFolder: reducer((state: State, folderName: string) => {
-			state.sortFolders[folderName] = [];
-		}),
-		addMultipleFolder: reducer((state: State, folderNames: string[]) => {
-			state.sortFolders = {}
-			folderNames.forEach((folderName) => {
-				state.sortFolders[folderName] = [];
-			})
-		}),
-	}
-);
+// Event handlers
+export async function updateView(view: View) {
+	reducers.setView(view);
+}
 
-// Event Router
-ACTIONS.on('*', async (type, e) => {
+export function sortImage(folderName: string) {
+	const { currentImageIndex, images } = store.getState();
+	if (currentImageIndex < images.length) {
+		reducers.sortImage(folderName);
+	}
+}
+
+export function addFolder() {
+	const folderName = prompt('Enter new folder name:');
+	if (folderName?.trim()) {
+		reducers.addFolder(folderName);
+	}
+}
+
+export async function openFolderRequestDialog() {
+	reducers.resetImageIndex();
+	console.log('clicked')
+	try {
+		const { result: newFolder } = await imageModule.pickFolder();
+		console.log('newFolder', newFolder)
+		if (newFolder) {
+			reducers.setBasePath(newFolder);
+		} else {
+			throw new Error('No folder selected');
+		}
+
+		const { result: folderList } = await imageModule.listFolders(store.getState().basePath);
+		if (folderList?.folders) {
+			reducers.addMultipleFolders([...DEFAULT_FOLDERS, ...folderList.folders]);
+		}
+	} catch (error) {
+		console.error('Error updating folders:', error);
+	}
+	reducers.setView('SORTER');
+}
+
+export const ACTIONS = mitt();
+
+ACTIONS.on('*', (type, payload: any) => {
 	switch (type) {
-		case 'updateView':
-			state._update('currentPage', e);
-			if(e === 'SORTER') {
-				state.currentImageIndex = 0;
-				const { result } = await imageModule.pickFolder();
-				if (result) {
-					state._update('addFolder', result);
-				}
-				const folderResult = await imageModule.listFolders(state.basePath)
-				if(folderResult.result) {
-					state._update('addMultipleFolder', ['Keep', 'Delete', ...folderResult.result.folders]);
-				}
-			}
-			return;
-		case 'sortImage':
-			if (state.currentImageIndex < state.images.length) {
-				state._update('sortImage', e);
-			}
-			return;
-		case 'addFolder':
-			const folderName = prompt('Enter new folder name:');
-			if (folderName && folderName.trim()) {
-				state._update('addFolder', folderName);
-			}
-			return;
 		case 'openFolderRequestDialog':
-			state._update('addMultipleFolder', 
-				['Keep', 'Delete', 'Lia', 'Inspo', 'Trees', 'Grass', 'Eyes']
-			);
-			state._update('currentPage', 'SORTER');
-			return;
+			openFolderRequestDialog();
+			break;
+		case 'sortImage':
+			if (typeof payload === 'string') {
+				sortImage(payload);
+			}
+			break;
+		case 'addFolder':
+			addFolder();
+			break;
+		case 'updateView':
+			updateView(payload);
+			break;
 		default:
-			console.log('No action found', type, e);
+			console.log('No action found:', type, payload);
 	}
 });
-
-

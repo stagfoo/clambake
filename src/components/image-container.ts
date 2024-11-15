@@ -1,4 +1,6 @@
 import html from 'nanohtml';
+//TODO weird
+import { State } from '../store';
 
 // TODo: Define the State type
 export function imageContainer(state: State): HTMLElement {
