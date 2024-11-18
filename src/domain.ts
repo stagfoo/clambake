@@ -1,108 +1,67 @@
 import mitt from 'mitt';
-import * as imageModule from './modules/image-handler';
-import { store, DEFAULT_FOLDERS } from './store';
-// Action Creators
+import * as todoModule from './modules/todo-handler';
+import { store } from './store';
+import { v4 as uuidv4 } from 'uuid';
+import { Todo } from './types'
+
 const reducers = {
-	setView: (view: View) => {
+	setView: (view: string) => {
 		store.setState(draft => {
 			draft.view = view;
 		});
 	},
 
-	setBasePath: (path: string) => {
+	setTodos: (todos: Todo[]) => {
 		store.setState(draft => {
-			draft.basePath = path;
+			draft.todos = todos;
 		});
 	},
 
-	sortImage: (folderName: string) => {
+	addTodo: (title: string) => {
 		store.setState(draft => {
-			if (draft.currentImageIndex >= draft.images.length) return;
-
-			draft.sortFolders[folderName] ??= [];
-			draft.sortFolders[folderName].push(draft.images[draft.currentImageIndex]);
-			draft.currentImageIndex++;
+			draft.todos.push({
+				id: uuidv4(),
+				title,
+				completed: false,
+				createdAt: new Date().toISOString()
+			});
 		});
 	},
 
-	addFolder: (folderName: string) => {
+	toggleTodo: (id: string) => {
 		store.setState(draft => {
-			if (!folderName || folderName in draft.sortFolders) return;
-			draft.sortFolders[folderName] = [];
-		});
-	},
-
-	addMultipleFolders: (folderNames: string[]) => {
-		store.setState(draft => {
-			draft.sortFolders = Object.fromEntries(folderNames.map(folder => [folder, []]));
-		});
-	},
-
-	resetImageIndex: () => {
-		store.setState(draft => {
-			draft.currentImageIndex = 0;
+			const todo = draft.todos.find(t => t.id === id);
+			if (todo) {
+				todo.completed = !todo.completed;
+			}
 		});
 	}
 };
 
-// Event handlers
-export async function updateView(view: View) {
-	reducers.setView(view);
-}
-
-export function sortImage(folderName: string) {
-	const { currentImageIndex, images } = store.getState();
-	if (currentImageIndex < images.length) {
-		reducers.sortImage(folderName);
-	}
-}
-
-export function addFolder() {
-	const folderName = prompt('Enter new folder name:');
-	if (folderName?.trim()) {
-		reducers.addFolder(folderName);
-	}
-}
-
-export async function openFolderRequestDialog() {
-	reducers.resetImageIndex();
-	console.log('clicked')
-	try {
-		const { result: newFolder } = await imageModule.pickFolder();
-		console.log('newFolder', newFolder)
-		if (newFolder) {
-			reducers.setBasePath(newFolder);
-		} else {
-			throw new Error('No folder selected');
-		}
-
-		const { result: folderList } = await imageModule.listFolders(store.getState().basePath);
-		if (folderList?.folders) {
-			reducers.addMultipleFolders([...DEFAULT_FOLDERS, ...folderList.folders]);
-		}
-	} catch (error) {
-		console.error('Error updating folders:', error);
-	}
-	reducers.setView('SORTER');
-}
-
 export const ACTIONS = mitt();
 
-ACTIONS.on('*', (type, payload: any) => {
+ACTIONS.on('*', async (type, payload: any) => {
 	switch (type) {
-		case 'openFolderRequestDialog':
-			openFolderRequestDialog();
-			break;
-		case 'sortImage':
+		case 'addTodo':
 			if (typeof payload === 'string') {
-				sortImage(payload);
+				reducers.addTodo(payload);
+				await todoModule.saveTodos(store.getState().todos);
 			}
 			break;
-		case 'addFolder':
-			addFolder();
+		case 'toggleTodo':
+			if (typeof payload === 'string') {
+				reducers.toggleTodo(payload);
+				await todoModule.saveTodos(store.getState().todos);
+			}
 			break;
-		case 'updateView':
-			updateView(payload);
+		case 'loadTodos':
+			const { result } = await todoModule.loadTodos();
+			if (result) {
+				reducers.setTodos(result);
+			}
+			break;
+		case 'saveTodos':
+			await todoModule.saveTodos(store.getState().todos);
 			break;
 		default:
 			console.log('No action found:', type, payload);

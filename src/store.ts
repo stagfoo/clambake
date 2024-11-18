@@ -1,28 +1,14 @@
 import { produce } from 'immer';
-
-type View = 'HOME' | 'SORTER';
+import type { Todo } from './types';
 
 export interface State {
-  currentImageIndex: number;
-  images: string[];
-  sortFolders: Record<string, string[]>;
-  basePath: string;
-  view: View;
+  todos: Todo[];
+  view: string;
 }
 
-// Constants
-export const DEFAULT_FOLDERS = ['Keep', 'Delete'] as const;
-
-// Initial State
 const defaultState: State = {
-  currentImageIndex: 0,
-  images: [
-    "https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp",
-    "https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp",
-  ],
-  sortFolders: Object.fromEntries(DEFAULT_FOLDERS.map(folder => [folder, []])),
-  basePath: 'DCIM',
-  view: 'HOME',
+  todos: [],
+  view: 'HOME'
 };
 
 // Create a store class to manage state

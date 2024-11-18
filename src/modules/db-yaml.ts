@@ -1,55 +1,54 @@
-// const yamlPath = 'db.yaml'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
-import { parse, stringify } from 'yaml'
+import { parse, stringify } from 'yaml';
+import { Todo } from '../types';
 
-const yamlPath = 'db.yaml'
-export function normalizeDataForHumanReadability(data: any) {
-    return {
-        data: data.createdAt,
-        message: data.message,
-        author: data.name,
-        image: data.image,
-    }
-}
-export async function saveDByaml(jsonData: any, path: string){
+const DB_PATH = 'todos.yaml';
 
-    const yamlString = stringify(normalizeDataForHumanReadability(jsonData), {  collectionStyle: "block" })
-    await Filesystem.writeFile({
-        path,
-        data: yamlString,
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8,
-      });
+export async function loadDB(): Promise<{ result?: Todo[], error?: any }> {
+  try {
+    const { data } = await Filesystem.readFile({
+      path: DB_PATH,
+      directory: Directory.Documents,
+      encoding: Encoding.UTF8
+    });
     
-    // Save file to device
-    // Use capacitor-blob-writer to write a blob to a file
-    // accept a string to write to the file
-    // accept a path to write the file to including the file name
-    // return a promise 
+    return { result: parse(data.toString()) as Todo[] || [] };
+  } catch (error) {
+    // If file doesn't exist, return empty array
+    if (error) {
+      return { result: [] };
+    }
+    return { error };
+  }
 }
 
-export async function loadFile(){
-    const contents = await Filesystem.readFile({
-        path: yamlPath,
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8,
-      });
-      console.log('yaml:', parse(contents.data.toString()));
-    // Load file from device
-    // Use capacitor-filesystem to read a file from the device
-    // accept a path to the file to read
-    // return a promise
-    // const parsedData = parse(yamlString)
+export async function saveDB(todos: Todo[]): Promise<{ result?: boolean, error?: any }> {
+  try {
+    const yamlString = stringify(todos, { collectionStyle: "block" });
+    await Filesystem.writeFile({
+      path: DB_PATH,
+      data: yamlString,
+      directory: Directory.Documents,
+      encoding: Encoding.UTF8
+    });
+    return { result: true };
+  } catch (error) {
+    return { error };
+  }
 }
 
-export async function listFiles() {
-    // List files in a directory
-    // Use capacitor-filesystem to list the files in a directory
-    // accept a path to the directory to list
-    // return a promise
-
-    // Do i want a list file with all the files in the directory
-    // or
-    // Do i want to list the files in the directory every time i open the app
+export async function listDBFiles(): Promise<{ result?: string[], error?: any }> {
+  try {
+    const result = await Filesystem.readdir({
+      path: '',
+      directory: Directory.Documents
+    });
+    
+    // Filter for yaml files only
+    const yamlFiles = result.files.filter(file => file.name.endsWith('.yaml'));
+    return { result: yamlFiles.map(file => file.name) };
+  } catch (error) {
+    return { error };
+  }
 }
 

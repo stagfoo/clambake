@@ -35,10 +35,12 @@
     "capacitor-folder-picker": "^0.0.2",
     "immer": "^10.1.1",
     "interactjs": "^1.10.27",
+    "js-yaml": "^4.1.0",
     "mitt": "^3.0.1",
     "morphdom": "^2.7.4",
     "nanohtml": "^1.9.0",
     "nanomorph": "^5.4.3",
+    "uuid": "^11.0.3",
     "vite-plugin-singlefile": "^2.0.3"
   },
   "devDependencies": {

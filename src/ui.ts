@@ -1,51 +1,57 @@
 import html from 'nanohtml';
-// TODO - rename UI to something more descriptive
-import * as UI from './components';
 import { ACTIONS } from './domain';
 import { State } from './store';
 
 export function ui(state: State): HTMLElement {
   return html`
-    <div id="app" style="width:  375px; margin: 0 auto">
-      <div class="flex justify-center flex-col">${routing(state)}</div>
+    <div id="app" class="container mx-auto p-4">
+      ${todoList(state)}
     </div>
   `;
 }
 
-export function routing(state: State): HTMLElement {
-  switch (state.view) {
-    case 'SORTER':
-      return html`
-      <div class="bg-gray-100 min-h-screen p-8">
-        <div class="max-w-2xl mx-auto space-y-8">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Image Sorter</h1>
-            <div class="flex flex-wrap gap-3" id="folders">
-              ${UI.keepButton(false)}
-              ${UI.deleteButton(false)}
-            </div>
-            ${UI.imageContainer(state)}
-            ${UI.folderButtons({
-              sortFolders: state.sortFolders,
-              currentImageIndex: state.currentImageIndex,
-              images: state.images,
-          })}
-          </div>
-          <div class="mt-4">
-          ${UI.progressIndicator(state)}
-        </div>
+function todoList(state: State): HTMLElement {
+  return html`
+    <div class="max-w-md mx-auto">
+      <h1 class="text-2xl font-bold mb-4">Todo List</h1>
+      
+      <div class="flex gap-2 mb-4">
+        <button onclick=${() => ACTIONS.emit('loadTodos')}
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Open DB
+        </button>
+        <button onclick=${() => ACTIONS.emit('saveTodos')} 
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+          Save DB
+        </button>
       </div>
+
+      <form onsubmit=${(e: Event) => {
+        e.preventDefault();
+        const input = (e.target as HTMLFormElement).querySelector('input');
+        if (input?.value) {
+          ACTIONS.emit('addTodo', input.value);
+          input.value = '';
+        }
+      }} class="mb-4">
+        <input type="text" 
+               placeholder="Add new todo" 
+               class="border p-2 rounded w-full"
+               required>
+      </form>
+
+      <ul class="space-y-2">
+        ${state.todos.map(todo => html`
+          <li class="flex items-center gap-2 p-2 border rounded">
+            <input type="checkbox" 
+                   ${todo.completed ? 'checked' : ''}
+                   onclick=${() => ACTIONS.emit('toggleTodo', todo.id)}>
+            <span class="${todo.completed ? 'line-through text-gray-500' : ''}">
+              ${todo.title}
+            </span>
+          </li>
+        `)}
+      </ul>
+    </div>
   `;
-    case 'HOME':
-      return html`
-      <div class="flex justify-center flex-col gap-3">
-        <img src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp" alt="logo" class="mx-auto mt-8" />
-      <button class="btn btn-primary" onclick=${() => ACTIONS.emit('openFolderRequestDialog', true)}>
-        Open Folder
-      </button/>
-      </div>
-        </div>
-      `;
-    default:
-      return html`<h1>404 CHUM</h1>`;
-  }
 }

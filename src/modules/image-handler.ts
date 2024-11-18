@@ -137,6 +137,7 @@ export async function listFolders(folderPath: string): Promise<{ result?: { fold
       console.log('Step 4 - Filtered folders:', folderList);
       return { result: { folderPath, folders: folderList } };
     }
+    return { error: 'No folder details available' };
   } catch (error) {
     console.error('Error processing folder details:', error);
     return { error: 'Failed to process folder details' };
