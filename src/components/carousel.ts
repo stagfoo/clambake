@@ -1,5 +1,5 @@
 import html from 'nanohtml';
-import { ACTIONS } from '../domain';
+import { actions } from '../domain';
 
 type CarouselProps = {
     items: {
@@ -15,7 +15,7 @@ export function carousel(props: CarouselProps): HTMLElement {
         ${props.items.map(item => html`
           <div class="carousel-item">
             <img
-              onclick="${() => ACTIONS.emit(item.event, item)}"
+              onclick="${() => actions.emit(item.event, item)}"
               src="${item.img}"
               class="rounded-box" />
           </div>

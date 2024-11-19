@@ -1,5 +1,5 @@
 import html from 'nanohtml';
-import { ACTIONS } from '../domain';
+import { actions } from '../domain';
 
 type listItemProps = {
     event: string;
@@ -10,7 +10,7 @@ type listItemProps = {
 export function listItem(props: listItemProps): HTMLElement {
     return html `
     <div class="flex flex-row items-center grow border-2 rounded p-2" onclick="${() => {
-        ACTIONS.emit(props.event, props)
+        actions.emit(props.event, props)
     }}">
     <div class="flex flex-col items-center">
     <div class="avatar">

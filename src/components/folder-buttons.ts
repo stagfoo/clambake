@@ -1,5 +1,5 @@
 import html from 'nanohtml';
-import { ACTIONS } from '../domain';
+import { actions } from '../domain';
 
 type FolderButtonsProps = {
   sortFolders: Record<string, string[]>;
@@ -19,7 +19,7 @@ function folderAction({
   buttonClass
 }: { folderName: string, isDisabled: boolean, buttonClass: string }) {
   return html`
-    <button onclick=${() => ACTIONS.emit('sortImage', folderName)}
+    <button onclick=${() => actions.emit('sortImage', folderName)}
             class="${`px-4 py-2 ${buttonClass} text-white rounded-md transition-colors duration-200 
                           ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}"
             ${isDisabled ? 'disabled' : ''}>
@@ -57,7 +57,7 @@ export function folderButtons(state: FolderButtonsProps): HTMLElement {
   });
 
   const addButton = html`
-      <button onclick=${() => ACTIONS.emit('addFolder', '')}
+      <button onclick=${() => actions.emit('addFolder', '')}
               class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 flex items-center gap-2
                      ${state.currentImageIndex >= state.images.length ? 'opacity-50 cursor-not-allowed' : ''}"
               ${state.currentImageIndex >= state.images.length ? 'disabled' : ''}>
