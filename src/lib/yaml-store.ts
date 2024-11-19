@@ -6,11 +6,13 @@ export type DBNormalizer<T> = (data: T[]) => T[];
 
 export class YAMLStore<T> {
   private dbPath: string;
+  private entityName: string;
   private rawItems: T[] = [];
   private saveNormalizer: DBNormalizer<T> | undefined;
   private loadNormalizer: DBNormalizer<T> | undefined;
 
   constructor(options: {
+    entityName?: string;
     dbPath?: string;
     saveNormalizer?: DBNormalizer<T>;
     loadNormalizer?: DBNormalizer<T>;
@@ -18,6 +20,7 @@ export class YAMLStore<T> {
     this.dbPath = options.dbPath || 'data.yaml';
     this.saveNormalizer = options.saveNormalizer;
     this.loadNormalizer = options.loadNormalizer;
+    this.entityName = options.entityName || 'data';
   }
 
   async load(): Promise<{ result?: T[], error?: any }> {
@@ -33,7 +36,7 @@ export class YAMLStore<T> {
       if (this.loadNormalizer) {
         items = this.loadNormalizer(this.rawItems);
       }
-      
+      console.log('load_result', items);
       return { result: items };
     } catch (error) {
       // If file doesn't exist, return empty array
@@ -51,12 +54,13 @@ export class YAMLStore<T> {
         : items;
 
       const yamlString = stringify(dataToSave, { collectionStyle: "block" });
-      await Filesystem.writeFile({
+      const fileResult = await Filesystem.writeFile({
         path: this.dbPath,
         data: yamlString,
         directory: Directory.Documents,
         encoding: Encoding.UTF8
       });
+      console.log('save_result', fileResult);
       return { result: true };
     } catch (error) {
       return { error };
@@ -79,23 +83,26 @@ export class YAMLStore<T> {
   }
 
   public wireActions(actions: Emitter<any>) {
-    actions.on(`save_${this.dbPath}`, async (items: T[]) => {
+    console.log('wireActions', `save_${String(this.entityName)}`);
+    actions.on(`save_${String(this.entityName)}`, async (items: T[]) => {
       const result = await this.save(items);
+      console.log('save_result', result);
       if (result.error) {
-        actions.emit(`save_${this.dbPath}_error`, result.error);
+        actions.emit(`save_${String(this.entityName)}_error`, result.error);
       } else {
-        actions.emit(`save_${this.dbPath}_success`, true);
+        actions.emit(`save_${String(this.entityName)}_success`, true);
       }
     });
 
-    actions.on(`load_${this.dbPath}`, async () => {
+    actions.on(`load_${String(this.entityName)}`, async () => {
       const result = await this.load();
       if (result.error) {
-        actions.emit(`load_${this.dbPath}_error`, result.error);
+        actions.emit(`load_${String(this.entityName)}_error`, result.error);
       } else {
-        actions.emit(`load_${this.dbPath}_success`, result.result);
+        actions.emit(`load_${String(this.entityName)}_success`, result.result);
       }
     });
+    return actions;
   }
 }
 

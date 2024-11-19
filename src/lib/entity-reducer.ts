@@ -1,4 +1,4 @@
-import mitt, { Emitter } from 'mitt';
+import { Emitter } from 'mitt';
 import { Store } from './store';
 
 export interface Entity {
