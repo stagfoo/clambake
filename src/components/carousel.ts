@@ -15,7 +15,7 @@ export function carousel(props: CarouselProps): HTMLElement {
         ${props.items.map(item => html`
           <div class="carousel-item">
             <img
-              onclick="${() => actions.emit(item.event, item)}"
+              onclick="${() => eventbus.emit(item.event, item)}"
               src="${item.img}"
               class="rounded-box" />
           </div>

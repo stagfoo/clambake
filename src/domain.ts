@@ -15,18 +15,18 @@ export interface State {
   
   
 export const store = new Store<State>(defaultState);
-export const actions = mitt();
+export const eventbus = mitt();
 
 export const todo = createTodos(store);
 
-todo.reducer.wireActions(actions);
-todo.module.wireActions(actions);
+todo.crud.listener(eventbus);
+todo.yamlDB.listener(eventbus);
 
 //Custom App Actions
-actions.on('*', async (type, payload: any) => {
+eventbus.on('*', async (type, payload: any) => {
 	switch (type) {
 		case 'load_todos_success':
-			todo.reducer.reducers.setAll(payload);
+			todo.crud.reducers.setAll(payload);
 		break;
 		case 'load_todos_error':
 			alert("Error loading todos");

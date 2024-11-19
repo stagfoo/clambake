@@ -1,5 +1,5 @@
 import html from 'nanohtml';
-import { actions } from './domain';
+import { eventbus } from './domain';
 import { State } from './domain';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,11 +18,11 @@ function todoList(state: State): HTMLElement {
       <h1 class="text-2xl font-bold mb-4">Todo List</h1>
       
       <div class="flex gap-2 mb-4">
-        <button onclick=${() => actions.emit('load_todos')}
+        <button onclick=${() => eventbus.emit('load_todos')}
                 class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           Open DB
         </button>
-        <button onclick=${() => actions.emit('save_todos', state.todos)} 
+        <button onclick=${() => eventbus.emit('save_todos', state.todos)} 
                 class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           Save DB
         </button>
@@ -32,7 +32,7 @@ function todoList(state: State): HTMLElement {
         e.preventDefault();
         const input = (e.target as HTMLFormElement).querySelector('input');
         if (input?.value) {
-          actions.emit('create_todos', {
+          eventbus.emit('create_todos', {
             title: input.value,
             id: uuidv4(),
             completed: false,
@@ -52,7 +52,7 @@ function todoList(state: State): HTMLElement {
           <li class="flex items-center gap-2 p-2 border rounded">
             <input type="checkbox" 
                    ${todo.completed ? 'checked' : ''}
-                   onclick=${() => actions.emit('update_todos', {
+                   onclick=${() => eventbus.emit('update_todos', {
                     id: todo.id,
                     updates: {
                       completed: !todo.completed,

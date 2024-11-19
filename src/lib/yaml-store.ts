@@ -82,27 +82,26 @@ export class YAMLStore<T> {
     }
   }
 
-  public wireActions(actions: Emitter<any>) {
+  public listener(eventbus: Emitter<any>) {
     console.log('wireActions', `save_${String(this.entityName)}`);
-    actions.on(`save_${String(this.entityName)}`, async (items: T[]) => {
+    eventbus.on(`save_${String(this.entityName)}`, async (items: T[]) => {
       const result = await this.save(items);
       console.log('save_result', result);
       if (result.error) {
-        actions.emit(`save_${String(this.entityName)}_error`, result.error);
+        eventbus.emit(`save_${String(this.entityName)}_error`, result.error);
       } else {
-        actions.emit(`save_${String(this.entityName)}_success`, true);
+        eventbus.emit(`save_${String(this.entityName)}_success`, true);
       }
     });
 
-    actions.on(`load_${String(this.entityName)}`, async () => {
+    eventbus.on(`load_${String(this.entityName)}`, async () => {
       const result = await this.load();
       if (result.error) {
-        actions.emit(`load_${String(this.entityName)}_error`, result.error);
+        eventbus.emit(`load_${String(this.entityName)}_error`, result.error);
       } else {
-        actions.emit(`load_${String(this.entityName)}_success`, result.result);
+        eventbus.emit(`load_${String(this.entityName)}_success`, result.result);
       }
     });
-    return actions;
   }
 }
 

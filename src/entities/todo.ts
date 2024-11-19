@@ -16,8 +16,8 @@ const normalizers = {
     load: (todos: Todo[]) => todos
 }
 export const createTodos = (store: Store<State>) => ({
-    reducer: new EntityCRUD<Todo, State>(store, 'todos'),
-    module: new YAMLStore<Todo>({
+    crud: new EntityCRUD<Todo, State>(store, 'todos'),
+    yamlDB: new YAMLStore<Todo>({
         entityName: 'todos',
         dbPath: 'todos.yaml',
         saveNormalizer: normalizers.save,

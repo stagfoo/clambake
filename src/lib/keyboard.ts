@@ -1,5 +1,5 @@
 import { Keyboard } from '@capacitor/keyboard';
-import { actions } from '../domain';
+import { eventbus } from '../domain';
 
 export type KeyboardEvents = {
     keyboardWillHide: boolean
@@ -10,18 +10,18 @@ export type KeyboardEvents = {
 
 //TODO do i want a keyboard event bus?
 Keyboard.addListener('keyboardWillShow', info => {
-    actions.emit('keyboardWillShow', info.keyboardHeight)
+    eventbus.emit('keyboardWillShow', info.keyboardHeight)
 });
 
 Keyboard.addListener('keyboardDidShow', info => {
-    actions.emit('keyboardDidShow', info.keyboardHeight);
+    eventbus.emit('keyboardDidShow', info.keyboardHeight);
 });
 
 Keyboard.addListener('keyboardWillHide', () => {
-    actions.emit('keyboardWillHide', true);
+    eventbus.emit('keyboardWillHide', true);
 });
 
 Keyboard.addListener('keyboardDidHide', () => {
-    actions.emit('keyboardDidHide', true);
+    eventbus.emit('keyboardDidHide', true);
 });
 

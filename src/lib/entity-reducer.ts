@@ -61,20 +61,20 @@ export class EntityCRUD<T extends Entity, S = any> {
   }
 
   // Auto-wire common actions to reducers
-  public wireActions(actions: Emitter<any>) {
-    actions.on(`create_${String(this.stateKey)}`, (payload: T) => {
+  public listener(eventbus: Emitter<any>) {
+    eventbus.on(`create_${String(this.stateKey)}`, (payload: T) => {
       this.reducers.create(payload);
     });
 
-    actions.on(`update_${String(this.stateKey)}`, (payload: { id: string, updates: Partial<T> }) => {
+    eventbus.on(`update_${String(this.stateKey)}`, (payload: { id: string, updates: Partial<T> }) => {
       this.reducers.update(payload.id, payload.updates);
     });
 
-    actions.on(`delete_${String(this.stateKey)}`, (id: string) => {
+    eventbus.on(`delete_${String(this.stateKey)}`, (id: string) => {
       this.reducers.delete(id);
     });
 
-    actions.on(`set_${String(this.stateKey)}`, (items: T[]) => {
+    eventbus.on(`set_${String(this.stateKey)}`, (items: T[]) => {
       this.reducers.setAll(items);
     });
   }
