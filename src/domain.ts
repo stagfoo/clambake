@@ -1,67 +1,31 @@
-import mitt from 'mitt';
-import * as todoModule from './modules/todo-handler';
-import { store } from './store';
-import { v4 as uuidv4 } from 'uuid';
-import { Todo } from './types'
+import mitt, { Emitter } from 'mitt';
+import { todoReducer, todoModule } from './entities/todo';
+import { Store } from './lib/store';
+import type { Todo } from './entities/todo';
 
-const reducers = {
-	setView: (view: string) => {
-		store.setState(draft => {
-			draft.view = view;
-		});
-	},
 
-	setTodos: (todos: Todo[]) => {
-		store.setState(draft => {
-			draft.todos = todos;
-		});
-	},
+export interface State {
+	todos: Todo[];
+	view: string;
+  }
+  
+  const defaultState: State = {
+	todos: [],
+	view: 'HOME'
+  };
+  
+  
+export const store = new Store<State>(defaultState);
+export const actions = mitt();
 
-	addTodo: (title: string) => {
-		store.setState(draft => {
-			draft.todos.push({
-				id: uuidv4(),
-				title,
-				completed: false,
-				createdAt: new Date().toISOString()
-			});
-		});
-	},
+todoReducer.wireActions(actions);
+todoModule.wireActions(actions);
 
-	toggleTodo: (id: string) => {
-		store.setState(draft => {
-			const todo = draft.todos.find(t => t.id === id);
-			if (todo) {
-				todo.completed = !todo.completed;
-			}
-		});
-	}
-};
-
-export const ACTIONS = mitt();
-
-ACTIONS.on('*', async (type, payload: any) => {
+//Custom App Actions
+actions.on('*', async (type, payload: any) => {
 	switch (type) {
-		case 'addTodo':
-			if (typeof payload === 'string') {
-				reducers.addTodo(payload);
-				await todoModule.saveTodos(store.getState().todos);
-			}
-			break;
-		case 'toggleTodo':
-			if (typeof payload === 'string') {
-				reducers.toggleTodo(payload);
-				await todoModule.saveTodos(store.getState().todos);
-			}
-			break;
-		case 'loadTodos':
-			const { result } = await todoModule.loadTodos();
-			if (result) {
-				reducers.setTodos(result);
-			}
-			break;
-		case 'saveTodos':
-			await todoModule.saveTodos(store.getState().todos);
+		case 'load_todos_success':
+			todoReducer.reducers.setAll(payload);
 			break;
 		default:
 			console.log('No action found:', type, payload);

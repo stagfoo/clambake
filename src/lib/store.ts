@@ -1,31 +1,19 @@
 import { produce } from 'immer';
-import type { Todo } from './types';
-
-export interface State {
-  todos: Todo[];
-  view: string;
-}
-
-const defaultState: State = {
-  todos: [],
-  view: 'HOME'
-};
-
 // Create a store class to manage state
-export class Store {
-    private state: State;
-    private listeners: ((state: State) => void)[];
+export class Store<T> {
+    private state: T;
+    private listeners: ((state: T) => void)[];
   
-    constructor(initialState: State) {
+    constructor(initialState: T) {
       this.state = initialState;
       this.listeners = [];
     }
   
-    getState(): State {
+    getState(): T {
       return this.state;
     }
   
-    setState(recipe: (draft: State) => void): void {
+    setState(recipe: (draft: T) => void): void {
       const newState = produce(this.state, recipe);
       if (newState !== this.state) {
         this.state = newState;
@@ -33,7 +21,7 @@ export class Store {
       }
     }
   
-    subscribe(listener: (state: State) => void): () => void {
+    subscribe(listener: (state: T) => void): () => void {
       this.listeners.push(listener);
       return () => {
         this.listeners = this.listeners.filter(l => l !== listener);
@@ -44,5 +32,3 @@ export class Store {
       this.listeners.forEach(listener => listener(this.state));
     }
   }
-
-export const store = new Store(defaultState);
